@@ -1,6 +1,9 @@
 require './player'
 require './question'
 
+class ArbitraryExceptionError < StandardError
+end
+
 class MathGamePlus
 
   def initialize
@@ -55,10 +58,14 @@ class MathGamePlus
       puts
       @theproblem.print_question
       puts
+   
+      begin      
 
       command = gets.chomp
 
-      if @theproblem.guess_answer?(command)
+      if command != "quit" && !command.match(/[0-9]+/)
+        raise ArbitraryExceptionError.new("Please answer with either a number or Quit")
+      elsif @theproblem.guess_answer?(command)
         @theplayers[@currentplayer].gain_point
         puts "\033[32mCorrect\033[0m\n"
         puts "========================================="
@@ -93,6 +100,9 @@ class MathGamePlus
         else
           switch_player
         end
+      end
+      rescue ArbitraryExceptionError
+        puts "\033[31mPlease enter either a number or Quit\033[0m\n"
       end
     end
 
@@ -155,10 +165,28 @@ class MathGamePlus
 
   def start_game
     puts "Players, please enter your names"
-    print "Player 1: "
-    p1 = gets.chomp
-    print "Player 2: "
-    p2 = gets.chomp
+    
+    begin
+      print "Player 1: "
+      p1 = gets.chomp
+      if p1.length ==0
+         raise ArbitraryExceptionError
+      end
+    rescue
+      puts "\033[31mPlease enter a name\033[0m\n"
+      retry
+    end
+  
+    begin
+      print "Player 2: "
+      p2 = gets.chomp
+      if p2.length == 0
+        raise ArbitraryExceptionError
+      end
+    rescue
+      puts "\033[31mPlease enter a name\033[0m\n"
+      retry
+    end
     set_players(p1, p2)
     puts
 
